@@ -117,3 +117,8 @@ function guess(W) {
     return the word in D' with the maximum HX[w]
 }
 ```
+
+## References
+
+- [dwyl/english-words](https://github.com/dwyl/english-words) - source for words_alpha.txt
+- [boompig/wordle-py](https://github.com/boompig/wordle-py) - source for wordle_words.txt

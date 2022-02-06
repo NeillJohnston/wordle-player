@@ -14,6 +14,9 @@ words = []
 start_words = {}
 abc = lambda: map(chr, range(ord('A'), ord('Z')+1))
 
+DEFAULT_WORDLIST = 'data/words_alpha.txt'
+START_WORDS = 'data/start_words.pickle'
+
 
 def outcome(w, cis):
     """Get the outcome of playing a list of guesses against a word w.
@@ -195,16 +198,21 @@ def main():
         default=False,
         help='Set if you do not want to use the precomputed start words'
     )
+    parser.add_argument(
+        '--wordlist',
+        default=DEFAULT_WORDLIST,
+        help='Path to the list of valid words to use'
+    )
     args = parser.parse_args()
     k = args.k
 
-    with open('words_alpha.txt') as words_file:
+    with open(args.wordlist) as words_file:
         words = map(lambda line: line.strip().upper(), words_file.readlines())
         words = filter(lambda w: len(w) == k, words)
         words = list(words)
 
     if not args.n:
-        with open('start_words.pickle', 'rb') as start_words_file:
+        with open(START_WORDS, 'rb') as start_words_file:
             start_words = pickle.load(start_words_file)
 
     if args.word is not None:
