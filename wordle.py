@@ -97,8 +97,8 @@ def make_guess(W, T, k, a=3):
     n = len(EHX)
     if n == 0:
         return None
-    # Check a% of the words, and at least 10
-    HX = EHX[:min(n, int(10 + a*n/10))]
+    # Check a% of the words, and at least 100
+    HX = EHX[:min(n, int(10 + a*n/100))]
     HX = [(entropy(w, T), w) for (_, w) in HX]
 
     (hw, w) = max(HX)
@@ -196,13 +196,24 @@ def play_interactive(W, T, k):
             break
 
 
-def run_test(W, T, k, n=100):
-    shuffle(T)
+def run_test(W, T, k, n, leaderboard):
+    if leaderboard:
+        T.sort()
+    else:
+        shuffle(T)
 
     data = []
+    if leaderboard:
+        turns = []
     for t in T[:n]:
-        x = len(play(t, W, T, k))
-        data.append(x)
+        x = play(t, W, T, k)
+        data.append(len(x))
+        if leaderboard:
+            turns.append(x)
+    if leaderboard:
+        with open('data/test.txt', 'w') as test_file:
+            for turn in turns:
+                test_file.write((','.join(turn) + '\n').lower())
 
     print(f'k={k}')
     print(f'mean turns to win: {sum(data)/n:.2f} (n={n})')
@@ -255,6 +266,11 @@ def main():
         default=False,
         help='Run a test on the algorithm with n iterations'
     )
+    parser.add_argument(
+        '--leaderboard',
+        action='store_true',
+        help='User with run_test. Run freshman.dev\'s Wordle leaderboard test and output results to data/test.txt'
+    )
     args = parser.parse_args()
     k = args.k
 
@@ -263,7 +279,7 @@ def main():
         words = filter(lambda w: len(w) == k, words)
         words = list(words)
 
-    with open(args.wordlist) as targets_file:
+    with open(args.targetlist) as targets_file:
         targets = map(lambda line: line.strip().upper(), targets_file.readlines())
         targets = filter(lambda w: len(w) == k, targets)
         targets = list(targets)
@@ -273,7 +289,7 @@ def main():
             start_words = pickle.load(start_words_file)
 
     if args.run_test:
-        run_test(words, targets, k, args.run_test)
+        run_test(words, targets, k, args.run_test, args.leaderboard)
         return
 
     if args.word is not None:
