@@ -1,5 +1,6 @@
 from enum import Enum
 from math import log2
+from random import shuffle
 import pickle
 import argparse
 
@@ -108,6 +109,7 @@ def play(target):
         start = False
         if w is None:
             print('could not guess word')
+            return None
 
         cis = mask_to_cis(w)
         r = outcome(target, cis)
@@ -177,6 +179,26 @@ def play_interactive():
             break
 
 
+# TARES -> .y.y.
+# ALANE -> .gg.g
+# ...
+# FLAME
+
+def run_test(n=2000):
+    order = words
+    shuffle(order)
+
+    data = []
+    for word in order[:n]:
+        x = len(play(word))
+        data.append(x)
+
+    print(f'k={k}')
+    print(f'mean turns to win: {sum(data)/n:.2f} (n={n})')
+    print(f'prop. games lost (>6 turns): {len([1 for x in data if x > 6])/n:.2f}')
+    print(f'longest game: {max(data)}')
+
+
 def main():
     global k, words, start_words
 
@@ -203,6 +225,12 @@ def main():
         default=DEFAULT_WORDLIST,
         help='Path to the list of valid words to use'
     )
+    parser.add_argument(
+        '--run-test',
+        action='store_true',
+        default=False,
+        help='Run a test on the algorithm'
+    )
     args = parser.parse_args()
     k = args.k
 
@@ -214,6 +242,10 @@ def main():
     if not args.n:
         with open(START_WORDS, 'rb') as start_words_file:
             start_words = pickle.load(start_words_file)
+
+    if args.run_test:
+        run_test()
+        return
 
     if args.word is not None:
         turns = play(args.word)

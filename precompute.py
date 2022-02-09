@@ -9,7 +9,7 @@ k_iter = lambda: range(MIN_LETTERS, MAX_LETTERS+1)
 
 
 words = {k: [] for k in k_iter()}
-with open('words_alpha.txt') as words_file:
+with open('data/wordle_answers.txt') as words_file:
     all_words = map(lambda line: line.strip().upper(), words_file.readlines())
     for word in all_words:
         if MIN_LETTERS <= len(word) <= MAX_LETTERS:
@@ -22,5 +22,5 @@ for k in k_iter():
     print(k, start_words[k])
 
 
-with open('start_words.pickle', 'wb') as start_words_file:
-    dump(start_words, start_words_file)
+# with open('start_words.pickle', 'wb') as start_words_file:
+#     dump(start_words, start_words_file)
